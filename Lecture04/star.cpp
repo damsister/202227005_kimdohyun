@@ -4,6 +4,7 @@ int main()
 {
 	while(1)
 	{
+		std::cout << '*';
 		if(_kbhit())
 		{
 			int ch = _getch();
@@ -12,7 +13,6 @@ int main()
 				break;
 			}
 		}
-		std::cout<< '*' <<std::endl;
-	}
+			}
 	return 0;
 }
