@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{6ab1d76d-0be0-4dd1-891f-9b355641f5f8}</ProjectGuid>
+    <ProjectGuid>{80dfbb81-767e-4d33-91d8-5e48547f088e}</ProjectGuid>
     <RootNamespace>snake</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
