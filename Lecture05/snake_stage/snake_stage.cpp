@@ -3,8 +3,7 @@
 #include <conio.h> //콘솔 인풋 아웃풋
 #include <Windows.h>  // gotoxy
 
-char** map = NULL;
-
+char** map;
 //game state == 0
 int print_title_screen()
 {
@@ -30,42 +29,56 @@ void gotoxy(int x, int y) {
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);//Window.h에 포함되어 있음
 }
 
-//int InitMap()
-//{
-//	if (map == nullptr)
-//	{
-//		map = (char**)malloc(sizeof(char*) * stage_);
-//		for (int i = 0; i < stage_height; i++)
-//		{
-//			map[i] = new char[stage_width];
-//		}
-//	}
-//	return 0;
-//}
-
-int ReleaseMap()
+int InitMap()//뱀을 생성하지 못했습니다.ㅠㅠ
 {
-
+	// 뱀 생성
+	int snake_x = 3;
+	int snake_y = 1;
+	map[snake_y][snake_x] = '@';
+	map[snake_y][snake_x + 1] = '#';
+	map[snake_y][snake_x + 2] = '#';
+	return 0;
 }
 
 int print_game_screen(int stage_width, int stage_height)
 {
-	for (int i = 0; i < stage_width + 2; i++)
+	//맵 생성
+	char** map = (char**)malloc(sizeof(char*) * stage_height);
+	for (int i = 0; i < stage_height; i++)
 	{
-		gotoxy(i, 0); //가로
-		std::cout << "●" << std::endl;
-
-		gotoxy(i, stage_height + 1); //1칸 이동해서 세로 그리기
-		std::cout << "●" << std::endl;
+		map[i] = (char*)malloc(sizeof(char) * stage_width);
+		// 맵 초기화
+		for (int j = 0; j < stage_width; j++)
+		{
+			if (i == 0 || i == stage_height - 1 || j == 0 || j == stage_width - 1)
+			{
+				// 가장자리는 벽으로 만듦
+				map[i][j] = '*';
+			}
+			else
+			{
+				// 그 외는 빈 공간으로 만듦
+				map[i][j] = ' ';
+			}
+		}
 	}
-	for (int i = 0; i < stage_height + 2; i++)
+
+	// 맵 출력
+	for (int i = 0; i < stage_height; i++)
 	{
-		gotoxy(0, i); //(0,0)으로 이동해서 세로 그림
-		std::cout << "●" << std::endl;
-
-		gotoxy(stage_width + 1, i); //1칸 이동해서 가로 그리기
-		std::cout << "●" << std::endl;
+		for (int j = 0; j < stage_width; j++)
+		{
+			std::cout << map[i][j] << " ";
+		}
+		std::cout << std::endl;
 	}
+
+	// 메모리 해제
+	for (int i = 0; i < stage_height; i++)
+	{
+		free(map[i]);
+	}
+	free(map);
 
 	return 0;
 }
@@ -84,32 +97,31 @@ int print_introduction_screen()
 
 int main()
 {
-	/*int game_state = 0; //게임 스테이지를 나타낼 변수
-	int is_game_runing = 1; //게임 종료(1:참, 0:거짓)
-	int mod_r = 1; //무조건 타이틀 화면이 나타나게 해야함
-	// 아무 키를 눌렀을 때 타이틀 화면이 나타나지 않게 하는 변수
+	int game_state = 0; //게임 스테이지
+	int is_game_runing = 1; //게임 종료
+	int mod_r = 1; //아무 키를 입력 받지 못하게 하는 코드
 
 	while (is_game_runing)
 	{
-		char key_input = 0; //key_input 초기화
-		switch (game_state) //전체 타이틀
+		char key_input = 0;
+		switch (game_state)
 		{
 		case 0:
-			if (mod_r) //1일 경우
+			if (mod_r)
 			{
 				print_title_screen();
 			}
 
-			key_input = _getch(); //1~4 중 입력을 받음
+			key_input = _getch();
 
-			mod_r = 0; //0으로 만들어서 해당 화면이 뜰 수 있게 만듬
+			mod_r = 0;
 
 			switch (key_input)
 			{
 			case '1':
 				game_state = 1;
-				mod_r = 1; //아무 키로 입력받지 않게 막음
-				break; //while문으로 이동
+				mod_r = 1;
+				break;
 			case '2':
 				game_state = 2;
 				mod_r = 1;
@@ -133,9 +145,12 @@ int main()
 				int y = 0;
 				std::cout << "너비와 높이를 입력하세요: " << std::endl;
 				scanf("%d", &x);
+				x = x + 2;
 				scanf("%d", &y);
-				system("cls"); //출력된 화면을 지워주는 코드
+				y = y + 2;
+				system("cls");
 				print_game_screen(x, y);
+				InitMap();
 			};
 			key_input = _getch();
 			mod_r = 0;
@@ -165,55 +180,6 @@ int main()
 			break;
 		}
 
-	}*/
-
-	//game_state 
-//0 : 게임 종료
-//1 : 시작 화면
-//2 : 게임 설명
-//3 : 랭킹 화면
-
-	int game_state = 1;
-
-	while (game_state)
-	{
-		switch (game_state)
-		{
-		case 0:
-			game_state = 0;
-			break;
-		case 1:
-			print_title_screen();
-			int sub_title_state = 1;
-			while (sub_title_state) //0이 되면 종료
-			{
-				char key_input = _getch();
-				switch (key_input)
-				{
-				case 0:
-					game_state = 0; //게임 종료
-					break;
-				case 1:
-					game_state = 1;
-					break;
-				case 2:
-					game_state = 2;
-					break;
-				case 3:
-					game_state = 3;
-					break;
-				default:
-					break;
-				}
-			}
-			break;
-		case 2:
-			break;
-		case 3:
-			break;
-		default:
-			break;
-		}
 	}
 	return 0;
 }
