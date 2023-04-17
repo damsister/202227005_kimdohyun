@@ -3,7 +3,9 @@
 #include <conio.h> //콘솔 인풋 아웃풋
 #include <Windows.h>  // gotoxy
 
-char** map;
+char** map = NULL;
+int stage_width = 15;
+int stage_height = 15;
 //game state == 0
 int print_title_screen()
 {
