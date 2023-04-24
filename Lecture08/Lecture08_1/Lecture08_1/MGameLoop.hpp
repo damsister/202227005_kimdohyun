@@ -1,0 +1,132 @@
+#pragma once //라는 간단한 방법이 있음 
+//#define _IS_THIS_HEADER_INCLUDED
+#include <iostream>
+#include <conio.h>
+#include <Windows.h>
+
+#define KEY_ESC 27 //아스키코드를 ESC로 정의
+#define KEY_LEFT 'a'
+#define KEY_RIGHT 'd'
+#define KEY_ENTER 13 
+
+//색 코드(외울 필요 없음)
+#define ANSI_COLOR_RED      "\x1b[31m" //바로 앞 문자열에 반영된다.
+#define ANSI_COLOR_GREEN    "\x1b[32m"
+#define ANSI_COLOR_YELLOW   "\x1b[33m"
+#define ANSI_COLOR_BLUE     "\x1b[34m"
+#define ANSI_COLOR_MAGENTA  "\x1b[35m"
+#define ANSI_COLOR_CYAN     "\x1b[36m"
+#define ANSI_COLOR_RESET    "\x1b[0m"
+
+
+namespace MuSoeun
+{
+	void gOTOXY(int x, int y) {
+		//x, y 좌표 설정
+		COORD pos = { x,y };
+		//커서 이동
+		SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
+	}
+
+	//커서 지우기
+	void SEtCursorState(bool visible)
+	{
+		CONSOLE_CURSOR_INFO consoleCursorInfo;
+		consoleCursorInfo.bVisible = visible;
+		consoleCursorInfo.dwSize = 1;
+		SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &consoleCursorInfo);
+	}
+
+	class MGameLoop
+	{
+	public : 
+		MGameLoop() {} //생성자
+		~MGameLoop() {} //소멸자
+
+		bool isGameRunning = false;
+
+		void Initialize()
+		{
+			isGameRunning = true;
+			gOTOXY(3, 15);
+			std::cout << ANSI_COLOR_RESET "게임 초기화 중" << std::endl;
+		}
+
+		void Release()
+		{
+			gOTOXY(3, 18);
+			std::cout << ANSI_COLOR_RESET "게임 종료" << std::endl;
+		}
+
+		void Update()
+		{
+			gOTOXY(3, 10);
+			std::cout << ANSI_COLOR_RESET "게임 키입력 대기" << std::endl;
+			
+			if (_kbhit())
+			{
+				KeyEvent(_getch()); //이 함수를 받아서
+			}
+
+		}
+		void Render()
+		{
+			gOTOXY(3, 17);
+			std::cout << ANSI_COLOR_RESET "게임 화면 그리기" << std::endl;
+		}
+
+		void Run()
+		{
+			Initialize();
+			while (isGameRunning)
+			{
+				Update();
+				Render();
+			}
+			Release();
+
+		}
+
+		void KeyEvent(char KeyInput)
+		{
+			switch (KeyInput)
+			{
+				//과제 : 한번 ESC 누르면 일시 정지가 되고 여기서 나가기를 선택하면 나간다.
+			case KEY_ESC:
+				isGameRunning = false;
+				break;
+			case KEY_LEFT:
+				gOTOXY(5, 5);
+				std::cout << ANSI_COLOR_RED "왼쪽 눌림  " << std::endl;
+				break;
+			case KEY_RIGHT:
+				gOTOXY(5, 5);
+				std::cout << ANSI_COLOR_GREEN "오른쪽 눌림  " << std::endl;
+				break;
+			case KEY_ENTER:
+				gOTOXY(5, 5);
+				std::cout << ANSI_COLOR_BLUE "엔터 눌림  " << std::endl;
+				break;
+			default:
+				isGameRunning = true;
+				break;
+			}
+		}
+		//키를 입력받기 위해서 중단점 사용한다.
+			/*while (isGameRunning)
+			{
+
+				Update();
+
+				std::cout << "게임 실행 중" << std::endl;
+				if (_kbhit())
+				{
+					if (_getch() == 27)
+					{
+						isGameRunning = false;
+					}
+				}
+			}*/
+	};
+}
+//로컬 Windows 디버거를 누를 것(F5를 누를 것)
