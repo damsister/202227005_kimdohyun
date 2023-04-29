@@ -21,7 +21,7 @@
 
 namespace MuSoeun
 {
-	void Gotoxy(int x, int y) 
+	void GoToxy(int x, int y) 
 	{
 		//x, y 좌표 설정
 		COORD pos = { x,y };
@@ -30,7 +30,7 @@ namespace MuSoeun
 	}
 
 	//커서 지우기
-	void SetcursorState(bool visible)
+	void SetCursorState(bool visible)
 	{
 		CONSOLE_CURSOR_INFO consoleCursorInfo;
 		consoleCursorInfo.bVisible = visible;
@@ -50,64 +50,32 @@ namespace MuSoeun
 
 		void Initialize()
 		{
-			SetcursorState(false);
-			Gotoxy(3, 15);
+			SetCursorState(false);
+			GoToxy(3, 15);
 			std::cout << ANSI_COLOR_RESET "게임 초기화 중" << std::endl;
 			isGameRunning = true;
 		}
 
 		void Release()
 		{
-			Gotoxy(3, 18);
+			GoToxy(3, 18);
 			std::cout << ANSI_COLOR_RESET "게임 종료" << std::endl;
 		}
 
 		void Update()
 		{
-			if (isMenuActive)
-			{
-				// 메뉴 활성화 상태일 때
-				if (_kbhit())
-				{
-					switch (_getch())
-					{
-					case KEY_LEFT:
-					case KEY_RIGHT:
-						// Yes와 No를 번갈아가면서 선택
-						isMenuYesSelected = !isMenuYesSelected;
-						break;
-					case KEY_ENTER:
-						// Enter 키를 누르면 메뉴 선택 완료
-						isMenuActive = false;
-						if (isMenuYesSelected)
-						{
-							isGameRunning = false;
-						}
-						break;
-					}
-				}
-
-				// 메뉴 그리기
-				Gotoxy(10, 20);
-				std::cout << (isMenuYesSelected ? ANSI_COLOR_YELLOW : ANSI_COLOR_RESET) << "[예]  ";
-				Gotoxy(20, 20);
-				std::cout << (!isMenuYesSelected ? ANSI_COLOR_YELLOW : ANSI_COLOR_RESET) << "[아니오]  ";
-				return;
-			}
-
-			Gotoxy(3, 16);
+			GoToxy(3, 16);
 			std::cout << ANSI_COLOR_RESET "게임 키입력 대기" << std::endl;
 			
 			if (_kbhit())
 			{
 				KeyEvent(_getch()); //이 함수를 받아서
 			}
-				
 		}
 
 		void Render()
 		{
-			Gotoxy(3, 17);
+			GoToxy(3, 17);
 			std::cout << ANSI_COLOR_RESET "게임 화면 그리기" << std::endl;
 		}
 
@@ -125,13 +93,12 @@ namespace MuSoeun
 		void ESC()
 		{
 			bool isYesSelected = true;
-			Gotoxy(5, 21);
+			GoToxy(5, 21);
 			std::cout << ANSI_COLOR_RESET "종료하시겠습니까?" << std::endl;
-			Gotoxy(5, 23);
+			GoToxy(5, 23);
 			std::cout << ANSI_COLOR_YELLOW "[예]" << std::endl;
-			Gotoxy(17, 23);
+			GoToxy(17, 23);
 			std::cout << ANSI_COLOR_RESET "[아니오]  " << std::endl;
-			Gotoxy(5, 23); //처음 선택된 메뉴는 "예"
 
 			while (true) // ESC를 눌러서 나갈 때까지 반복한다.
 			{
@@ -146,16 +113,16 @@ namespace MuSoeun
 						// 선택된 메뉴에 따라 노란색 또는 기본 색상으로 출력한다.
 						if (isYesSelected)
 						{
-							Gotoxy(5, 23);
+							GoToxy(5, 23);
 							std::cout << ANSI_COLOR_YELLOW "[예]  " << std::endl;
-							Gotoxy(17, 23);
+							GoToxy(17, 23);
 							std::cout << ANSI_COLOR_RESET "[아니오]  " << std::endl;
 						}
 						else
 						{
-							Gotoxy(5, 23);
+							GoToxy(5, 23);
 							std::cout << ANSI_COLOR_RESET "[예]  " << std::endl;
-							Gotoxy(17, 23);
+							GoToxy(17, 23);
 							std::cout << ANSI_COLOR_YELLOW "[아니오]  " << std::endl;
 						}
 					}
@@ -168,11 +135,11 @@ namespace MuSoeun
 						}
 						else
 						{
-							Gotoxy(3, 21);
+							GoToxy(3, 21);
 							std::cout << "                     " << std::endl; //종료 메시지 지우기
-							Gotoxy(5, 23);
+							GoToxy(5, 23);
 							std::cout << "     " << std::endl; //선택 메뉴 지우기
-							Gotoxy(17, 23);
+							GoToxy(17, 23);
 							std::cout << "        " << std::endl;
 							isGameRunning = true;
 							break; //반복문 종료
@@ -190,15 +157,15 @@ namespace MuSoeun
 				ESC();
 			break;
 			case KEY_LEFT:
-				Gotoxy(5, 5);
+				GoToxy(5, 5);
 				std::cout << ANSI_COLOR_RED "왼쪽 눌림  " << std::endl;
 				break;
 			case KEY_RIGHT:
-				Gotoxy(5, 5);
+				GoToxy(5, 5);
 				std::cout << ANSI_COLOR_GREEN "오른쪽 눌림  " << std::endl;
 				break;
 			case KEY_ENTER:
-				Gotoxy(5, 5);
+				GoToxy(5, 5);
 				std::cout << ANSI_COLOR_BLUE "엔터 눌림  " << std::endl;
 				break;
 			default:
