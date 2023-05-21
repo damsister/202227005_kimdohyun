@@ -33,12 +33,12 @@ void gotoxy(int x, int y) {
 
 int InitMap()//뱀을 생성하지 못했습니다.ㅠㅠ
 {
-	// 뱀 생성
-	int snake_x = 3;
-	int snake_y = 1;
-	map[snake_y][snake_x] = '@';
-	map[snake_y][snake_x + 1] = '#';
-	map[snake_y][snake_x + 2] = '#';
+	//// 뱀 생성
+	//int snake_x = 3;
+	//int snake_y = 1;
+	//map[snake_y][snake_x] = '@';
+	//map[snake_y][snake_x + 1] = '#';
+	//map[snake_y][snake_x + 2] = '#';
 	return 0;
 }
 
