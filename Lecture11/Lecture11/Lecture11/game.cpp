@@ -1,6 +1,7 @@
 #include "game.h"
 #include <conio.h> // 콘솔 인풋 아웃풋
 
+
 void Object::Render(char* screenBuf) const
 {
     // Object의 렌더링 기능 구현
@@ -100,6 +101,11 @@ int introduction_screen()
 	return 0;
 }
 
+int GameOver_screen()
+{
+	return 0;
+}
+
 void start_game()
 {
     int width = 40;
@@ -111,17 +117,17 @@ void start_game()
     {
         for (int j = 0; j < width; j++)
         {
-            if (i == height / 2 && j >= width / 2 - 1 && j <= width / 2 + 1)
+            if (i == height / 2 && j >= width / 2 && j <= width / 2)
             {
-                std::cout << "@";
+                std::cout << ANSI_COLOR_BLUE "@";
             }
             else if (i == 0 || i == height - 1 || j == 0 || j == width - 1)
             {
-                std::cout << "*";
+                std::cout << ANSI_COLOR_RESET "*";
             }
             else
             {
-                std::cout << " ";
+                std::cout << ANSI_COLOR_RESET " ";
             }
         }
         std::cout << std::endl;
@@ -249,10 +255,10 @@ int main()
 				mod_r = 1;
 				system("cls");
 				break;
-			case KEY_UP:
+			case KEY_LEFT:
 				//snake.y++;
 				break;
-			case KEY_DOWN:
+			case KEY_RIGHT:
 				//snake.y--;
 				break;
 			default:
@@ -286,3 +292,27 @@ int main()
 	}
 	return 0;
 }
+
+//#include <chrono>
+//chrono:컴퓨터 시스템 시간
+//startRenderTiemPoint = chrono::system_clock::now(); //현재시간가져오는 
+//isKeyPressed();
+
+//class Scene
+// vector<object>
+// sc[000]
+//class Object
+// vector<commpont>
+//class Commpont
+//start()
+//update()
+
+//transform
+//rigidbody : Commpont
+// new() -> vector<commpont> push-> cubeobj new()-> vector<object> Scene.Draw->vector<commpont>
+//
+
+//kbhit()//화면을 띄우거나 등 입력을 받지 않음
+//눌려있으면 1 -> 입력
+//떼져있으면 0 -> 입력X
+//스레드 : 동시에 시작

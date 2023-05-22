@@ -8,8 +8,6 @@
 #define KEY_ESC 27 //아스키코드를 ESC로 정의
 #define KEY_LEFT 'a'
 #define KEY_RIGHT 'd'
-#define KEY_UP 'w'
-#define KEY_DOWN 's'
 #define KEY_ENTER 13 
 
 //색 코드(외울 필요 없음)
