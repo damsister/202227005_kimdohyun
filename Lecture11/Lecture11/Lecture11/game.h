@@ -1,14 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include <iostream>
-#include <vector>
 #include <Windows.h>
-
-const int LEFT = 0;
-const int RIGHT = 1;
-const int UP = 2;
-const int DOWN = 3;
 
 #define KEY_ESC 27 //아스키코드를 ESC로 정의
 #define KEY_LEFT 'a'
@@ -26,7 +19,6 @@ const int DOWN = 3;
 #define ANSI_COLOR_CYAN     "\x1b[36m"
 #define ANSI_COLOR_RESET    "\x1b[0m"
 
-
 //커서 지우기
 void SetcursorState(bool visible)
 {
@@ -36,7 +28,7 @@ void SetcursorState(bool visible)
     SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &consoleCursorInfo);
 }
 
-void Gotoxy(int x, int y)
+void gotoxy(int x, int y)
 {
     //x, y 좌표 설정
     COORD pos = { x,y };
@@ -44,70 +36,9 @@ void Gotoxy(int x, int y)
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
 }
 
-class Point {
-public:
-    int x;
-    int y;
-
-    Point(int xCoord, int yCoord) : x(xCoord), y(yCoord) {}
-};
-
-class Snake
-{
-public:
-    int x;
-    int y;
-    int direction; // 뱀의 방향
-    bool isAlive;
-    Scene& scene;  // Scene 멤버 변수 추가
-    std::vector<Point> tail;  // tail 멤버 변수 추가
-
-public:
-
-    Snake(int startX, int startY);
-
-    void MoveLeft();
-    void MoveRight();
-    void MoveUp();
-    void MoveDown();
-
-    bool isAlive;
-    void CheckCollision();
-};
-
-class Object
-{
-public:
-    void Render(char* screenBuf) const;
-};
-
-class Scene
-{
-public:
-    int width;
-    int height;
-    std::vector<Object> objList;
-
-    char* screenBuf;
-
-    Scene(int w, int h);
-    ~Scene();
-
-    void Initialize();
-    void InitScreenBuf();
-    void ReleaseScreenBuf();
-    void Draw();
-    void ClearScreenBuf();
-};
-
-//class Component
-//{
-//public:
-//    void Start();
-//    void Update();
-//};
-
-void print_title_screen();
-void start_game();
+void Setup();
+void Draw();
+void Input();
+void Logic();
 
 #endif

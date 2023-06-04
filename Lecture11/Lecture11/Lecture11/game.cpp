@@ -1,437 +1,305 @@
 #include "game.h"
 #include <iostream>
-#include <conio.h>// 콘솔 인풋 아웃풋
-#include <thread>
-#include <chrono>
+#include <conio.h>
+#include <windows.h>
 
-bool isGameOver = false;
+using namespace std;
 
-Snake::Snake(int startX, int startY)
+bool gameOver;
+const int width = 20;
+const int height = 20;
+int x, y, fruitX, fruitY, score;
+int tailX[100], tailY[100];
+int nTail;
+enum eDirection { STOP = 0, LEFT, RIGHT, UP, DOWN };
+eDirection dir;
+
+void Setup()
 {
-    x = startX;
-    y = startY;
-    direction;
-    isAlive = true;
+    gameOver = false;
+    dir = STOP;
+    x = width / 2;
+    y = height / 2;
+    fruitX = rand() % width;
+    fruitY = rand() % height;
+    score = 0;
 }
 
-void Snake::MoveLeft() {
-    x--;
-    CheckCollision();
+void print_title()
+{
+    cout << ANSI_COLOR_RESET"****************************************" << endl;
+    cout << ANSI_COLOR_RESET"*                                      *" << endl;
+    cout << ANSI_COLOR_RESET"*                                      *" << endl;
+    cout << ANSI_COLOR_RESET"*          뱀군아 공 가져가라          *" << endl;
+    cout << ANSI_COLOR_RESET"*                                      *" << endl;
+    cout << ANSI_COLOR_RESET"*            1. 게임 시작              *" << endl;
+    cout << ANSI_COLOR_RESET"*            2. 게임 설명              *" << endl;
+    cout << ANSI_COLOR_RESET"*           게임 종료 (esc)            *" << endl;
+    cout << ANSI_COLOR_RESET"*                                      *" << endl;
+    cout << ANSI_COLOR_RESET"****************************************" << endl;
 }
 
-void Snake::MoveRight() {
-    x++;
-    CheckCollision();
+int introduction()
+{
+    cout << ANSI_COLOR_RESET"******************************************" << endl;
+    cout << ANSI_COLOR_RESET"*         게임 설명화면입니다.           *" << endl;
+    cout << ANSI_COLOR_RESET"*         게임 설명은 안할겁니다.        *" << endl;
+    cout << ANSI_COLOR_RESET"******************************************" << endl;
+    cout << ANSI_COLOR_RESET"*   타이틀화면으로 돌아갈까요? (Y/N)     *" << endl;
+    cout << ANSI_COLOR_RESET"******************************************" << endl;
+    return 0;
 }
 
-void Snake::MoveUp() {
-    y--;
-    CheckCollision();
-}
+int GameOver()
+{
+    system("cls");
+    cout << "****************************************" << endl;
+    cout << "              게임 오버!" << endl;
+    cout << "       게임을 종료하시겠습니까? (Y/N) " << endl;
+    cout << "****************************************" << endl;
 
-void Snake::MoveDown() {
-    y++;
-    CheckCollision();
-}
+    char key_input;
 
-void Snake::CheckCollision() {
-    // 벽에 부딪혔을 때 게임 오버
-    if (x <= 0 || x >= scene.width - 2 || y <= 0 || y >= scene.height - 1) {
-        isAlive = false;
+    key_input = _getch();
+
+    if (key_input == 'y')
+    {
+        exit(0);
     }
-
-    // 꼬리에 부딪혔을 때 게임 오버
-    for (int i = 1; i < tail.size(); i++) {
-        if (x == tail[i].x && y == tail[i].y) {
-            isAlive = false;
-            break;
-        }
+    else if (key_input == 'n')
+    {
+        system("cls");
+        print_title();
     }
+    return 0;
 }
 
-void Object::Render(char* screenBuf) const
+void Draw()
 {
-    // Object의 렌더링 기능 구현
-    // screenBuf를 활용하여 Object의 모양을 그린다.
-}
+    system("cls");
+    for (int i = 0; i < width + 2; i++)
+        cout << "#";
+    cout << endl;
 
-Scene::Scene(int w, int h) : width(w), height(h)
-{
-    Initialize();
-}
-
-Scene::~Scene()
-{
-    ReleaseScreenBuf();
-}
-
-void Scene::Initialize()
-{
-    objList.clear();
-    InitScreenBuf();
-}
-
-void Scene::InitScreenBuf()
-{
-    screenBuf = new char[(width + 1) * height + height];
     for (int i = 0; i < height; i++)
     {
-        screenBuf[(width + 1) + (width + 1) * i - 1] = '\n';
-    }
-    screenBuf[(width + 1) + (width + 1) * (height - 1) - 1] = '\0';
-}
-
-void Scene::ReleaseScreenBuf()
-{
-    if (screenBuf != nullptr)
-    {
-        delete[] screenBuf;
-    }
-}
-
-void Scene::Draw()
-{
-    ClearScreenBuf();
-
-    // Active한 Object의 Render 호출
-    for (const Object& obj : objList)
-    {
-        obj.Render(screenBuf);
-    }
-
-    // 화면 전체를 출력
-    std::cout << screenBuf;
-}
-
-void Scene::ClearScreenBuf()
-{
-    for (int i = 0; i < (width + 1) * height; i++)
-    {
-        screenBuf[i] = ' ';
-    }
-}
-
-//void Component::Start()
-//{
-//    // Start 함수 구현
-//}
-//
-//void Component::Update()
-//{
-//    // Update 함수 구현
-//}
-
-void print_title_screen()
-{
-    std::cout << "****************************************" << std::endl;
-    std::cout << "*                                      *" << std::endl;
-    std::cout << "*                                      *" << std::endl;
-    std::cout << "*          뱀군아 공 가져가라          *" << std::endl;
-    std::cout << "*                                      *" << std::endl;
-    std::cout << "*            1. 게임 시작              *" << std::endl;
-    std::cout << "*            2. 게임 설명              *" << std::endl;
-    std::cout << "*           게임 종료 (esc)            *" << std::endl;
-    std::cout << "*                                      *" << std::endl;
-    std::cout << "****************************************" << std::endl;
-}
-
-int introduction_screen()
-{
-    std::cout << ANSI_COLOR_RESET"******************************************" << std::endl;
-    std::cout << ANSI_COLOR_RESET"*         게임 설명화면입니다.           *" << std::endl;
-    std::cout << ANSI_COLOR_RESET"*         게임 설명은 안할겁니다.        *" << std::endl;
-    std::cout << ANSI_COLOR_RESET"******************************************" << std::endl;
-    std::cout << ANSI_COLOR_RESET"*   타이틀화면으로 돌아갈까요? (Y/N)     *" << std::endl;
-    std::cout << ANSI_COLOR_RESET"******************************************" << std::endl;
-    return 0;
-}
-
-int GameOver_screen()
-{
-    Gotoxy(5, 10);
-    std::cout << "*************************" << std::endl;
-    std::cout << "*       게임 오버       *" << std::endl;
-    std::cout << "*************************" << std::endl;
-    return 0;
-}
-
-void start_game()
-{
-    int width = 40;
-    int height = 20;
-
-    Scene scene(width, height);
-
-    // 뱀 생성
-    Snake snake(scene.width / 2 - 1, scene.height / 2);
-
-    while (true)
-    {
-        if (_kbhit()) // 키 입력 받기
+        for (int j = 0; j < width; j++)
         {
-            char key = _getch();
-
-            switch (key)
+            if (j == 0)
+                cout << "#";
+            if (i == y && j == x)
+                cout << "O";
+            else if (i == fruitY && j == fruitX)
+                cout << "F";
+            else
             {
-            case KEY_LEFT:
-                snake.direction = LEFT; // 뱀의 방향을 왼쪽으로 설정
-                break;
-            case KEY_RIGHT:
-                snake.direction = RIGHT; // 뱀의 방향을 오른쪽으로 설정
-                break;
-            case KEY_UP:
-                snake.direction = UP; // 뱀의 방향을 위로 설정
-                break;
-            case KEY_DOWN:
-                snake.direction = DOWN; // 뱀의 방향을 아래로 설정
-                break;
-            }
-
-            // 뱀 이동 후, 새로운 위치에 뱀 그리기
-            for (int i = 0; i < height; i++)
-            {
-                for (int j = 0; j < width; j++)
+                bool printTail = false;
+                for (int k = 0; k < nTail; k++)
                 {
-                    if (i == snake.y && j >= snake.x && j <= snake.x + 1)
+                    if (tailX[k] == j && tailY[k] == i)
                     {
-                        std::cout << ANSI_COLOR_BLUE "@"; // 이동한 뱀 표시
-                    }
-                    else if (i == 0 || i == height - 1 || j == 0 || j == width - 1)
-                    {
-                        std::cout << ANSI_COLOR_RESET "*"; // 벽 표시
-                    }
-                    else
-                    {
-                        std::cout << ANSI_COLOR_RESET " "; // 빈 공간 표시
+                        cout << "o";
+                        printTail = true;
                     }
                 }
-                std::cout << std::endl;
-            }
-            if (key == KEY_ESC)
-            {
-                break;
-                system("cls");
-                print_title_screen();
-            }
-        }
-        else
-        {
-            // 키 입력이 없을 때에는 계속해서 뱀을 이동시킵니다.
-            switch (snake.direction)
-            {
-            case LEFT:
-                snake.MoveLeft(); // 뱀을 왼쪽으로 이동
-                break;
-            case RIGHT:
-                snake.MoveRight(); // 뱀을 오른쪽으로 이동
-                break;
-            case UP:
-                snake.MoveUp(); // 뱀을 위로 이동
-                break;
-            case DOWN:
-                snake.MoveDown(); // 뱀을 아래로 이동
-                break;
+                if (!printTail)
+                    cout << " ";
             }
 
-            // 뱀 이동 후, 새로운 위치에 뱀 그리기
-            for (int i = 0; i < height; i++)
-            {
-                for (int j = 0; j < width; j++)
-                {
-                    if (i == snake.y && j >= snake.x && j <= snake.x + 1)
-                    {
-                        std::cout << ANSI_COLOR_BLUE "@"; // 이동한 뱀 표시
-                    }
-                    else if (i == 0 || i == height - 1 || j == 0 || j == width - 1)
-                    {
-                        std::cout << ANSI_COLOR_RESET "*"; // 벽 표시
-                    }
-                    else
-                    {
-                        std::cout << ANSI_COLOR_RESET " "; // 빈 공간 표시
-                    }
-                }
-                std::cout << std::endl;
-            }
-            system("cls");
+            if (j == width - 1)
+                cout << "#";
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(200)); // 뱀 이동 딜레이
-        // 게임 오버 처리
-        if (!snake.isAlive) {
-            GameOver_screen();
+        cout << endl;
+    }
+
+    for (int i = 0; i < width + 2; i++)
+        cout << "#";
+    cout << endl;
+    cout << "Score:" << score << endl;
+    cout << "게임 종료를 하려면 ESC를 눌러주세요" << endl;
+}
+
+void Input()
+{
+    if (_kbhit())
+    {
+        switch (_getch())
+        {
+        case KEY_LEFT:
+            dir = LEFT;
+            break;
+        case KEY_RIGHT:
+            dir = RIGHT;
+            break;
+        case KEY_UP:
+            dir = UP;
+            break;
+        case KEY_DOWN:
+            dir = DOWN;
+            break;
+        case KEY_ESC:
+            gameOver = true;
             break;
         }
+    }
+}
+
+void Logic()
+{
+    int prevX = tailX[0];
+    int prevY = tailY[0];
+    int prev2X, prev2Y;
+    tailX[0] = x;
+    tailY[0] = y;
+
+    for (int i = 1; i < nTail; i++)
+    {
+        prev2X = tailX[i];
+        prev2Y = tailY[i];
+        tailX[i] = prevX;
+        tailY[i] = prevY;
+        prevX = prev2X;
+        prevY = prev2Y;
+    }
+
+    switch (dir)
+    {
+    case LEFT:
+        x--;
+        break;
+    case RIGHT:
+        x++;
+        break;
+    case UP:
+        y--;
+        break;
+    case DOWN:
+        y++;
+        break;
+    default:
+        break;
+    }
+
+    if (x >= width || x < 0 || y >= height || y < 0)
+        gameOver = true;
+
+    for (int i = 0; i < nTail; i++)
+    {
+        if (tailX[i] == x && tailY[i] == y)
+        {
+            gameOver = true;
+            break;
+        }
+    }
+
+    if (x == fruitX && y == fruitY)
+    {
+        score += 10;
+        fruitX = rand() % width;
+        fruitY = rand() % height;
+        nTail++;
     }
 }
 
 int main()
 {
-    int game_state = 0; // 게임 스테이지
-    int isgamerunning = 1; // 게임 종료
-    int mod_r = 1; // 아무 키를 입력 받지 못하게 하는 코드
-    bool isYesSelected = true;
+    print_title();
 
-    while (isgamerunning)
+    while (true)
     {
-        char key_input = 0;
-        switch (game_state)
+        if (_kbhit())
         {
-        case 0:
-            if (mod_r)
+            char key = _getch();
+            if (key == '1')
             {
-                print_title_screen();
-                // scene의 screenBuf에 타이틀 화면 저장
-            }
-
-            key_input = _getch();
-
-            mod_r = 0;
-
-            switch (key_input)
-            {
-            case '1':
-                game_state = 1;
-                mod_r = 1;
                 system("cls");
-                start_game();
-                break;
-            case '2':
-                game_state = 2;
-                mod_r = 1;
-                break;
-            case 27:
-                if (key_input == KEY_ESC)
+                Setup();
+                while (!gameOver)
                 {
-                    isYesSelected = true;
-                    mod_r = 0; // 아무 키를 입력 받지 못하게 하는 코드
-                    // 게임 종료
-                    Gotoxy(5, 12);
-                    std::cout << ANSI_COLOR_RESET "종료하시겠습니까?" << std::endl;
-                    Gotoxy(5, 13);
-                    std::cout << ANSI_COLOR_YELLOW "[예]" << std::endl;
-                    Gotoxy(15, 13);
-                    std::cout << ANSI_COLOR_RESET "[아니오]  " << std::endl;
+                    Draw();
+                    Input();
+                    Logic();
+                    Sleep(10); // 게임 속도 조절을 위한 지연
+                }
+                GameOver();
+            }
+            else if (key == '2')
+            {
+                system("cls");
+                introduction();
+                char choice = _getch();
+                if (choice == 'Y' || choice == 'y')
+                {
+                    system("cls");
+                    print_title();
+                }
+                else if (choice == 'N' || choice == 'n')
+                {
+                    system("cls");
+                    break;
+                }
+            }
+            else if (key == KEY_ESC)
+            {
+                // 게임 종료
+                gotoxy(5, 12);
+                cout << ANSI_COLOR_RESET "종료하시겠습니까?" << endl;
+                gotoxy(5, 13);
+                cout << ANSI_COLOR_YELLOW "[예]" << endl;
+                gotoxy(15, 13);
+                cout << ANSI_COLOR_RESET "[아니오]  " << endl;
 
-                    while (true) // ESC를 눌러서 나갈 때까지 반복한다.
+                bool isYesSelected = true;
+                while (true) // ESC를 눌러서 나갈 때까지 반복한다.
+                {
+                    if (_kbhit()) // 키 입력 받기
                     {
-                        if (_kbhit()) // 키 입력 받기
+                        char key = _getch();
+
+                        if (key == KEY_LEFT || key == KEY_RIGHT) // 'a' 또는 'd'가 입력되면 선택된 메뉴를 변경한다.
                         {
-                            char key = _getch();
+                            isYesSelected = !isYesSelected;
 
-                            if (key == KEY_LEFT || key == KEY_RIGHT) // 'a' 또는 'd'가 입력되면 선택된 메뉴를 변경한다.
+                            // 선택된 메뉴에 따라 노란색 또는 기본 색상으로 출력한다.
+                            if (isYesSelected)
                             {
-                                isYesSelected = !isYesSelected;
-
-                                // 선택된 메뉴에 따라 노란색 또는 기본 색상으로 출력한다.
-                                if (isYesSelected)
-                                {
-                                    Gotoxy(5, 13);
-                                    std::cout << ANSI_COLOR_YELLOW "[예]  ";
-                                    Gotoxy(15, 13);
-                                    std::cout << ANSI_COLOR_RESET "[아니오]  ";
-                                }
-                                else
-                                {
-                                    Gotoxy(5, 13);
-                                    std::cout << ANSI_COLOR_RESET "[예]  ";
-                                    Gotoxy(15, 13);
-                                    std::cout << ANSI_COLOR_YELLOW "[아니오]  ";
-                                }
+                                gotoxy(5, 13);
+                                cout << ANSI_COLOR_YELLOW "[예]  ";
+                                gotoxy(15, 13);
+                                cout << ANSI_COLOR_RESET "[아니오]  ";
                             }
-                            else if (key == KEY_ENTER) // Enter가 입력되면 선택된 메뉴에 따라 종료하거나 게임을 계속 실행한다.
+                            else
                             {
-                                if (isYesSelected)
-                                {
-                                    isgamerunning = false;
-                                    break;
-                                }
-                                else
-                                {
-                                    Gotoxy(5, 12);
-                                    std::cout << "                     " << std::endl; // 종료 메시지 지우기
-                                    Gotoxy(5, 13);
-                                    std::cout << "     " << std::endl; // 선택 메뉴 지우기
-                                    Gotoxy(15, 13);
-                                    std::cout << "        " << std::endl;
-                                    isgamerunning = true;
-                                    break; // 반복문 종료
-                                    print_title_screen();
-                                }
+                                gotoxy(5, 13);
+                                cout << ANSI_COLOR_RESET "[예]  ";
+                                gotoxy(15, 13);
+                                cout << ANSI_COLOR_YELLOW "[아니오]  ";
+                            }
+                        }
+                        else if (key == KEY_ENTER) // Enter가 입력되면 선택된 메뉴에 따라 종료하거나 게임을 계속 실행한다.
+                        {
+                            if (isYesSelected)
+                            {
+                                exit(0); // 종료
+                            }
+                            else
+                            {
+                                gotoxy(5, 12);
+                                cout << ANSI_COLOR_RESET"                     " << endl; // 종료 메시지 지우기
+                                gotoxy(5, 13);
+                                cout << ANSI_COLOR_RESET"     " << endl; // 선택 메뉴 지우기
+                                gotoxy(15, 13);
+                                cout << ANSI_COLOR_RESET"        " << endl;
+                                system("cls");
+                                print_title();
+                                break; // 반복문 종료
                             }
                         }
                     }
                 }
-                break;
-            default:
-                break;
             }
-            break;
-        case 1:
-            if (mod_r)
-            {
-                system("cls");
-                start_game();
-            }
-            key_input = _getch();
-            mod_r = 0;
-
-            switch (key_input)
-            {
-            case KEY_ESC:
-                game_state = 0;
-                mod_r = 1;
-                system("cls");
-                break;
-            default:
-                break;
-            }
-            break;
-        case 2:
-            if (mod_r)
-            {
-                system("cls");
-                introduction_screen();
-            }
-            key_input = _getch();
-            mod_r = 0;
-
-            if (key_input == 'y')
-            {
-                mod_r = 1;
-                game_state = 0;
-                system("cls");
-            }
-            else if (key_input == 'n')
-            {
-                isgamerunning = 0;
-            }
-            break;
         }
     }
 
     return 0;
 }
-
-//#include <chrono>
-//chrono:컴퓨터 시스템 시간
-//startRenderTiemPoint = chrono::system_clock::now(); //현재시간가져오는 
-//isKeyPressed();
-
-//class Scene
-// vector<object>
-// sc[000]
-//class Object
-// vector<commpont>
-//class Commpont
-//start()
-//update()
-
-//transform
-//rigidbody : Commpont
-// new() -> vector<commpont> push-> cubeobj new()-> vector<object> Scene.Draw->vector<commpont>
-//
-
-//kbhit()//화면을 띄우거나 등 입력을 받지 않음
-//눌려있으면 1 -> 입력
-//떼져있으면 0 -> 입력X
-//스레드 : 동시에 시작
