@@ -88,9 +88,9 @@ void Draw()
             if (j == 0)
                 cout << "#";
             if (i == y && j == x)
-                cout << "O";
+                cout << "@";
             else if (i == fruitY && j == fruitX)
-                cout << "F";
+                cout << "0";
             else
             {
                 bool printTail = false;
@@ -219,7 +219,7 @@ int main()
                     Draw();
                     Input();
                     Logic();
-                    Sleep(10); // 게임 속도 조절을 위한 지연
+                    Sleep(50); // 게임 속도 조절을 위한 지연
                 }
                 GameOver();
             }
@@ -303,3 +303,27 @@ int main()
 
     return 0;
 }
+
+//#include <chrono>
+//chrono:컴퓨터 시스템 시간
+//startRenderTiemPoint = chrono::system_clock::now(); //현재시간가져오는 
+//isKeyPressed();
+
+//class Scene
+// vector<object>
+// sc[000]
+//class Object
+// vector<commpont>
+//class Commpont
+//start()
+//update()
+
+//transform
+//rigidbody : Commpont
+// new() -> vector<commpont> push-> cubeobj new()-> vector<object> Scene.Draw->vector<commpont>
+//
+
+//kbhit()//화면을 띄우거나 등 입력을 받지 않음
+//눌려있으면 1 -> 입력
+//떼져있으면 0 -> 입력X
+//스레드 : 동시에 시작
