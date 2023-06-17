@@ -54,8 +54,8 @@ int introduction()
 {
     cout << ANSI_COLOR_RESET"******************************************" << endl;
     cout << ANSI_COLOR_RESET"*         게임 설명화면입니다.           *" << endl;
-    cout << ANSI_COLOR_RESET"*         0 -> 점수 : +10, 몸 : +1       *" << endl;
-    cout << ANSI_COLOR_RESET"*         % -> 점수 : -8, 몸 : -1        *" << endl;
+    cout << ANSI_COLOR_RESET"*         0 -> 점수 : +10, 공 : +1       *" << endl;
+    cout << ANSI_COLOR_RESET"*         % -> 점수 : -8, 공 : -1        *" << endl;
     cout << ANSI_COLOR_RESET"*         ^ -> 게임오버                  *" << endl;
     cout << ANSI_COLOR_RESET"******************************************" << endl;
     cout << ANSI_COLOR_RESET"*   타이틀화면으로 돌아갈까요? (Y/N)     *" << endl;
@@ -152,7 +152,7 @@ void Draw()
     }
 
     cout << endl;
-    cout << ANSI_COLOR_RESET"Score:" << score << endl;
+    cout << ANSI_COLOR_RESET"공 :" << score << endl;
     cout << ANSI_COLOR_RESET"게임 종료를 하려면 ESC를 눌러주세요" << endl;
 
 }
