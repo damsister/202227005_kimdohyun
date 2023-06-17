@@ -47,7 +47,7 @@ void print_title()
     cout << ANSI_COLOR_RESET"*           게임 종료 (esc)            *" << endl;
     cout << ANSI_COLOR_RESET"*                                      *" << endl;
     cout << ANSI_COLOR_RESET"****************************************" << endl;
-    cout << ANSI_COLOR_RESET"    공 많이 챙겨서 승진해야지!" << endl;
+    cout << ANSI_COLOR_RESET"    공 많이 챙겨서 승진해야지!"           << endl;
 }
 
 int introduction()
