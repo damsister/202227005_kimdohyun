@@ -68,3 +68,8 @@ int WriteToBuffer(int x, int y, const char* str)
 
 	return 0;
 }
+
+void setCursorVisibility(int isVisible)
+{
+	setCursorIcon(isVisible);
+}

@@ -6,9 +6,9 @@
 using namespace std;
 
 bool gameOver;
-const int width = 20;
+const int width = 40;
 const int height = 20;
-int x, y, fruitX, fruitY, score;
+int x, y, fruitX, fruitY, percentX, percentY, caretX, caretY, score;
 int tailX[100], tailY[100];
 int nTail;
 enum eDirection { STOP = 0, LEFT, RIGHT, UP, DOWN };
@@ -20,9 +20,19 @@ void Setup()
     dir = STOP;
     x = width / 2;
     y = height / 2;
-    fruitX = rand() % width;
-    fruitY = rand() % height;
+    fruitX = rand() % width; //0(공)
+    fruitY = rand() % height; //0(공)
+    caretX = rand() % width; //^(게임이 끝나는 장애물)
+    caretY = rand() % height; //^(게임이 끝나는 장애물)
     score = 0;
+
+    // 뱀의 꼬리 초기화
+    nTail = 0;
+    for (int i = 0; i < 100; i++)
+    {
+        tailX[i] = 0;
+        tailY[i] = 0;
+    }
 }
 
 void print_title()
@@ -30,20 +40,23 @@ void print_title()
     cout << ANSI_COLOR_RESET"****************************************" << endl;
     cout << ANSI_COLOR_RESET"*                                      *" << endl;
     cout << ANSI_COLOR_RESET"*                                      *" << endl;
-    cout << ANSI_COLOR_RESET"*          뱀군아 공 가져가라          *" << endl;
+    cout << ANSI_COLOR_RESET"*          뱀군아 공 가져챙겨          *" << endl;
     cout << ANSI_COLOR_RESET"*                                      *" << endl;
     cout << ANSI_COLOR_RESET"*            1. 게임 시작              *" << endl;
     cout << ANSI_COLOR_RESET"*            2. 게임 설명              *" << endl;
     cout << ANSI_COLOR_RESET"*           게임 종료 (esc)            *" << endl;
     cout << ANSI_COLOR_RESET"*                                      *" << endl;
     cout << ANSI_COLOR_RESET"****************************************" << endl;
+    cout << ANSI_COLOR_RESET"    공 많이 챙겨서 승진해야지!" << endl;
 }
 
 int introduction()
 {
     cout << ANSI_COLOR_RESET"******************************************" << endl;
     cout << ANSI_COLOR_RESET"*         게임 설명화면입니다.           *" << endl;
-    cout << ANSI_COLOR_RESET"*         게임 설명은 안할겁니다.        *" << endl;
+    cout << ANSI_COLOR_RESET"*         0 -> 점수 : +10, 몸 : +1       *" << endl;
+    cout << ANSI_COLOR_RESET"*         % -> 점수 : -8, 몸 : -1        *" << endl;
+    cout << ANSI_COLOR_RESET"*         ^ -> 게임오버                  *" << endl;
     cout << ANSI_COLOR_RESET"******************************************" << endl;
     cout << ANSI_COLOR_RESET"*   타이틀화면으로 돌아갈까요? (Y/N)     *" << endl;
     cout << ANSI_COLOR_RESET"******************************************" << endl;
@@ -53,10 +66,13 @@ int introduction()
 int GameOver()
 {
     system("cls");
-    cout << "****************************************" << endl;
-    cout << "              게임 오버!" << endl;
-    cout << "       게임을 종료하시겠습니까? (Y/N) " << endl;
-    cout << "****************************************" << endl;
+    cout << ANSI_COLOR_RESET"****************************************" << endl;
+    cout << ANSI_COLOR_RESET"              게임 오버!" << endl;
+    cout << ANSI_COLOR_RESET"              " << endl;
+    cout << ANSI_COLOR_RESET"              공 개수: " << score << endl;
+    cout << ANSI_COLOR_RESET"              "<< endl;
+    cout << ANSI_COLOR_RESET"       게임을 종료하시겠습니까? (Y/N) " << endl;
+    cout << ANSI_COLOR_RESET"****************************************" << endl;
 
     char key_input;
 
@@ -71,6 +87,10 @@ int GameOver()
         system("cls");
         print_title();
     }
+    else
+    {
+        GameOver(); // 잘못된 입력이면 다시 GameOver 함수 호출
+    }
     return 0;
 }
 
@@ -78,7 +98,7 @@ void Draw()
 {
     system("cls");
     for (int i = 0; i < width + 2; i++)
-        cout << "#";
+        cout << ANSI_COLOR_GREEN"#";
     cout << endl;
 
     for (int i = 0; i < height; i++)
@@ -86,11 +106,25 @@ void Draw()
         for (int j = 0; j < width; j++)
         {
             if (j == 0)
-                cout << "#";
+            {
+                cout << ANSI_COLOR_GREEN"#";
+            }
             if (i == y && j == x)
-                cout << "@";
+            {
+                cout << ANSI_COLOR_RESET"@";
+            }
             else if (i == fruitY && j == fruitX)
-                cout << "0";
+            {
+                cout << ANSI_COLOR_YELLOW"0";
+            }
+            else if (i == percentY && j == percentX)
+            {
+                cout << ANSI_COLOR_CYAN"%";
+            }
+            else if (i == caretY && j == caretX)
+            {
+                cout << ANSI_COLOR_RED"^";
+            }
             else
             {
                 bool printTail = false;
@@ -98,7 +132,7 @@ void Draw()
                 {
                     if (tailX[k] == j && tailY[k] == i)
                     {
-                        cout << "o";
+                        cout << ANSI_COLOR_RESET"o";
                         printTail = true;
                     }
                 }
@@ -107,16 +141,20 @@ void Draw()
             }
 
             if (j == width - 1)
-                cout << "#";
+                cout << ANSI_COLOR_GREEN"#";
         }
         cout << endl;
     }
 
     for (int i = 0; i < width + 2; i++)
+    {
         cout << "#";
+    }
+
     cout << endl;
-    cout << "Score:" << score << endl;
-    cout << "게임 종료를 하려면 ESC를 눌러주세요" << endl;
+    cout << ANSI_COLOR_RESET"Score:" << score << endl;
+    cout << ANSI_COLOR_RESET"게임 종료를 하려면 ESC를 눌러주세요" << endl;
+
 }
 
 void Input()
@@ -126,15 +164,19 @@ void Input()
         switch (_getch())
         {
         case KEY_LEFT:
+            if (dir != RIGHT) // 현재 방향이 오른쪽이 아닌 경우에만 왼쪽으로 변경
             dir = LEFT;
             break;
         case KEY_RIGHT:
+            if (dir != LEFT) // 현재 방향이 왼쪽이 아닌 경우에만 오른쪽으로 변경
             dir = RIGHT;
             break;
         case KEY_UP:
+            if (dir != DOWN) // 현재 방향이 아래쪽이 아닌 경우에만 위쪽으로 변경
             dir = UP;
             break;
         case KEY_DOWN:
+            if (dir != UP) // 현재 방향이 위쪽이 아닌 경우에만 아래쪽으로 변경
             dir = DOWN;
             break;
         case KEY_ESC:
@@ -181,7 +223,9 @@ void Logic()
     }
 
     if (x >= width || x < 0 || y >= height || y < 0)
+    {
         gameOver = true;
+    }
 
     for (int i = 0; i < nTail; i++)
     {
@@ -192,14 +236,39 @@ void Logic()
         }
     }
 
+    // 뱀이 공을 먹을 때마다 '^' 하나씩 랜덤 생성
     if (x == fruitX && y == fruitY)
     {
         score += 10;
         fruitX = rand() % width;
         fruitY = rand() % height;
         nTail++;
+
+        // '^'의 랜덤한 좌표 생성
+        caretX = rand() % width;
+        caretY = rand() % height;
+        // '%'의 랜덤한 좌표 생성
+        percentX = rand() % width;
+        percentY = rand() % height;
+    }
+
+    // '%'에 닿았을 때 점수 감소 및 뱀의 몸통 감소
+    if (x == percentX && y == percentY)
+    {
+        score -= 8;
+        if (nTail > 0)
+            nTail--;
+        percentX = rand() % width;
+        percentY = rand() % height;
+    }
+
+    // '^'에 닿았을 때 게임 오버
+    if (x == caretX && y == caretY)
+    {
+        gameOver = true;
     }
 }
+
 
 int main()
 {
