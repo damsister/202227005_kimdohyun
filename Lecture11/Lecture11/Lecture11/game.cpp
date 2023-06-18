@@ -99,6 +99,7 @@ void Draw()
     SetcursorState(false); // 커서 지우기
 
     system("cls");
+
     for (int i = 0; i < width + 2; i++)
         cout << ANSI_COLOR_GREEN"#";
     cout << endl;
