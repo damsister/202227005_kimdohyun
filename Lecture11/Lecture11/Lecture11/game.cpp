@@ -18,8 +18,8 @@ void Setup()
 {
     gameOver = false;
     dir = STOP;
-    x = width / 2;
-    y = height / 2;
+    x = width / 2; //뱀의 초기 위치
+    y = height / 2; //뱀의 초기 위치
     fruitX = rand() % width; //0(공)
     fruitY = rand() % height; //0(공)
     caretX = rand() % width; //^(게임이 끝나는 장애물)
@@ -35,7 +35,7 @@ void Setup()
     }
 }
 
-void print_title()
+void Print_title()
 {
     cout << ANSI_COLOR_RESET"****************************************" << endl;
     cout << ANSI_COLOR_RESET"*                                      *" << endl;
@@ -47,10 +47,10 @@ void print_title()
     cout << ANSI_COLOR_RESET"*           게임 종료 (esc)            *" << endl;
     cout << ANSI_COLOR_RESET"*                                      *" << endl;
     cout << ANSI_COLOR_RESET"****************************************" << endl;
-    cout << ANSI_COLOR_RESET"    공 많이 챙겨서 승진해야지!"           << endl;
+    cout << ANSI_COLOR_RESET"    공 많이 챙겨서 승진해야지!" << endl;
 }
 
-int introduction()
+int Introduction()
 {
     cout << ANSI_COLOR_RESET"******************************************" << endl;
     cout << ANSI_COLOR_RESET"*         게임 설명화면입니다.           *" << endl;
@@ -70,7 +70,7 @@ int GameOver()
     cout << ANSI_COLOR_RESET"              게임 오버!" << endl;
     cout << ANSI_COLOR_RESET"              " << endl;
     cout << ANSI_COLOR_RESET"              공 개수: " << score << endl;
-    cout << ANSI_COLOR_RESET"              "<< endl;
+    cout << ANSI_COLOR_RESET"              " << endl;
     cout << ANSI_COLOR_RESET"       게임을 종료하시겠습니까? (Y/N) " << endl;
     cout << ANSI_COLOR_RESET"****************************************" << endl;
 
@@ -85,7 +85,7 @@ int GameOver()
     else if (key_input == 'n')
     {
         system("cls");
-        print_title();
+        Print_title();
     }
     else
     {
@@ -96,6 +96,8 @@ int GameOver()
 
 void Draw()
 {
+    SetcursorState(false); // 커서 지우기
+
     system("cls");
     for (int i = 0; i < width + 2; i++)
         cout << ANSI_COLOR_GREEN"#";
@@ -139,7 +141,6 @@ void Draw()
                 if (!printTail)
                     cout << " ";
             }
-
             if (j == width - 1)
                 cout << ANSI_COLOR_GREEN"#";
         }
@@ -154,7 +155,6 @@ void Draw()
     cout << endl;
     cout << ANSI_COLOR_RESET"공 :" << score << endl;
     cout << ANSI_COLOR_RESET"게임 종료를 하려면 ESC를 눌러주세요" << endl;
-
 }
 
 void Input()
@@ -165,19 +165,19 @@ void Input()
         {
         case KEY_LEFT:
             if (dir != RIGHT) // 현재 방향이 오른쪽이 아닌 경우에만 왼쪽으로 변경
-            dir = LEFT;
+                dir = LEFT;
             break;
         case KEY_RIGHT:
             if (dir != LEFT) // 현재 방향이 왼쪽이 아닌 경우에만 오른쪽으로 변경
-            dir = RIGHT;
+                dir = RIGHT;
             break;
         case KEY_UP:
             if (dir != DOWN) // 현재 방향이 아래쪽이 아닌 경우에만 위쪽으로 변경
-            dir = UP;
+                dir = UP;
             break;
         case KEY_DOWN:
             if (dir != UP) // 현재 방향이 위쪽이 아닌 경우에만 아래쪽으로 변경
-            dir = DOWN;
+                dir = DOWN;
             break;
         case KEY_ESC:
             gameOver = true;
@@ -236,7 +236,6 @@ void Logic()
         }
     }
 
-    // 뱀이 공을 먹을 때마다 '^' 하나씩 랜덤 생성
     if (x == fruitX && y == fruitY)
     {
         score += 10;
@@ -269,10 +268,9 @@ void Logic()
     }
 }
 
-
 int main()
 {
-    print_title();
+    Print_title();
 
     while (true)
     {
@@ -295,12 +293,12 @@ int main()
             else if (key == '2')
             {
                 system("cls");
-                introduction();
+                Introduction();
                 char choice = _getch();
                 if (choice == 'Y' || choice == 'y')
                 {
                     system("cls");
-                    print_title();
+                    Print_title();
                 }
                 else if (choice == 'N' || choice == 'n')
                 {
@@ -360,7 +358,7 @@ int main()
                                 gotoxy(15, 13);
                                 cout << ANSI_COLOR_RESET"        " << endl;
                                 system("cls");
-                                print_title();
+                                Print_title();
                                 break; // 반복문 종료
                             }
                         }

@@ -35,10 +35,4 @@ void gotoxy(int x, int y)
     //커서 이동
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
 }
-
-void Setup();
-void Draw();
-void Input();
-void Logic();
-
 #endif
