@@ -9,6 +9,7 @@
 #define KEY_UP 'w'
 #define KEY_DOWN 's'
 #define KEY_ENTER 13 
+#define KEY_STOP 'q' 
 
 //색 코드(외울 필요 없음)
 #define ANSI_COLOR_RED      "\x1b[31m" //바로 앞 문자열에 반영된다.

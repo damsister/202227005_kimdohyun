@@ -8,11 +8,17 @@ using namespace std;
 bool gameOver;
 const int width = 40;
 const int height = 20;
-int x, y, fruitX, fruitY, percentX, percentY, caretX, caretY, score;
+int x, y, fruitX, fruitY, percentX, percentY, caretX, caretY, score, collisitionCount;
 int tailX[100], tailY[100];
 int nTail;
 enum eDirection { STOP = 0, LEFT, RIGHT, UP, DOWN };
 eDirection dir;
+bool promoted = false; //승진 여부를 나타내는 변수 추가
+string ranks;
+
+// 백 버퍼 배열 정의
+char buffer[height][width];
+char oldBuffer[height][width];
 
 void Setup()
 {
@@ -25,6 +31,8 @@ void Setup()
     caretX = rand() % width; //^(게임이 끝나는 장애물)
     caretY = rand() % height; //^(게임이 끝나는 장애물)
     score = 0;
+    ranks = "인턴";
+    collisitionCount = 4;
 
     // 뱀의 꼬리 초기화
     nTail = 0;
@@ -54,8 +62,9 @@ int Introduction()
 {
     cout << ANSI_COLOR_RESET"******************************************" << endl;
     cout << ANSI_COLOR_RESET"*         게임 설명화면입니다.           *" << endl;
-    cout << ANSI_COLOR_RESET"*         0 -> 점수 : +10, 공 : +1       *" << endl;
-    cout << ANSI_COLOR_RESET"*         % -> 점수 : -8, 공 : -1        *" << endl;
+    cout << ANSI_COLOR_RESET"*         0 -> 점수 : +5, 공 : +1        *" << endl;
+    cout << ANSI_COLOR_RESET"*         % -> 점수 : -3, 공 : -1        *" << endl;
+    cout << ANSI_COLOR_RESET"*         % -> 4번 닿으면 게임오버       *" << endl;
     cout << ANSI_COLOR_RESET"*         ^ -> 게임오버                  *" << endl;
     cout << ANSI_COLOR_RESET"******************************************" << endl;
     cout << ANSI_COLOR_RESET"*   타이틀화면으로 돌아갈까요? (Y/N)     *" << endl;
@@ -69,7 +78,39 @@ int GameOver()
     cout << ANSI_COLOR_RESET"****************************************" << endl;
     cout << ANSI_COLOR_RESET"              게임 오버!" << endl;
     cout << ANSI_COLOR_RESET"              " << endl;
-    cout << ANSI_COLOR_RESET"              공 개수: " << score << endl;
+    cout << ANSI_COLOR_RESET"              점수: " << score << endl;
+    cout << ANSI_COLOR_RESET"              직급 :" << ranks << endl;
+    cout << ANSI_COLOR_RESET"              " << endl;
+    cout << ANSI_COLOR_RESET"       게임을 종료하시겠습니까? (Y/N) " << endl;
+    cout << ANSI_COLOR_RESET"****************************************" << endl;
+
+    char key_input;
+
+    key_input = _getch();
+
+    if (key_input == 'y')
+    {
+        exit(0);
+    }
+    else if (key_input == 'n')
+    {
+        system("cls");
+        Print_title();
+    }
+    else
+    {
+        GameOver(); // 잘못된 입력이면 다시 GameOver 함수 호출
+    }
+    return 0;
+}
+
+int GameOver1()
+{
+    system("cls");
+    cout << ANSI_COLOR_RESET"****************************************" << endl;
+    cout << ANSI_COLOR_RESET"        임원진이 된 것을 축하합니다~~~" << endl;
+    cout << ANSI_COLOR_RESET"              " << endl;
+    cout << ANSI_COLOR_RESET"              점수: " << score << endl;
     cout << ANSI_COLOR_RESET"              " << endl;
     cout << ANSI_COLOR_RESET"       게임을 종료하시겠습니까? (Y/N) " << endl;
     cout << ANSI_COLOR_RESET"****************************************" << endl;
@@ -98,7 +139,22 @@ void Draw()
 {
     SetcursorState(false); // 커서 지우기
 
-    system("cls");
+    // 버퍼 교체
+    for (int i = 0; i < height; i++) 
+    {
+        for (int j = 0; j < width; j++) 
+        {
+            if (buffer[i][j] != oldBuffer[i][j]) 
+            {
+                gotoxy(j, i);
+                cout << buffer[i][j];
+                oldBuffer[i][j] = buffer[i][j];
+            }
+        }
+    }
+
+    // 화면 업데이트
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { 0, 0 });
 
     for (int i = 0; i < width + 2; i++)
         cout << ANSI_COLOR_GREEN"#";
@@ -154,8 +210,11 @@ void Draw()
     }
 
     cout << endl;
-    cout << ANSI_COLOR_RESET"공 :" << score << endl;
+    cout << ANSI_COLOR_RESET"점수 : " << score << "  " << endl;
+    cout << ANSI_COLOR_RESET"직급 :" << ranks << endl;
+    cout << ANSI_COLOR_RESET"충돌 횟수 :" << collisitionCount << endl;
     cout << ANSI_COLOR_RESET"게임 종료를 하려면 ESC를 눌러주세요" << endl;
+    cout << ANSI_COLOR_RESET"일시정지를 하려면 Q를 눌러주세요" << endl;
 }
 
 void Input()
@@ -182,6 +241,23 @@ void Input()
             break;
         case KEY_ESC:
             gameOver = true;
+            break;
+        case KEY_STOP:
+            gotoxy(width / 2 - 5, height / 2);
+            cout << ANSI_COLOR_BLUE"일시정지" << endl;
+            while (true)
+            {
+                if (_kbhit())
+                {
+                    char resumeKey = _getch();
+                    if (resumeKey == 'q' || resumeKey == 'Q')
+                    {
+                        gotoxy(width / 2 - 5, height / 2);
+                        cout << "          " << endl; // 일시정지 메시지 지우기
+                        break; // 일시정지 해제
+                    }
+                }
+            }
             break;
         }
     }
@@ -239,7 +315,7 @@ void Logic()
 
     if (x == fruitX && y == fruitY)
     {
-        score += 10;
+        score += 5;
         fruitX = rand() % width;
         fruitY = rand() % height;
         nTail++;
@@ -255,11 +331,43 @@ void Logic()
     // '%'에 닿았을 때 점수 감소 및 뱀의 몸통 감소
     if (x == percentX && y == percentY)
     {
-        score -= 8;
+        score -= 3;
         if (nTail > 0)
             nTail--;
         percentX = rand() % width;
         percentY = rand() % height;
+        collisitionCount--;
+    }
+
+    if (ranks == "사원" || ranks == "주임") // 두 직급 모두 같은 승진 로직을 가짐
+    {
+        promoted = true;
+        ranks = "사원"; // 또는 "주임", 선호에 따라 변경
+    }
+    else if (ranks == "대리")
+    {
+        promoted = false;
+        ranks = "주임";
+    }
+    else if (ranks == "과장")
+    {
+        promoted = false;
+        ranks = "대리";
+    }
+    else if (ranks == "차장")
+    {
+        promoted = false;
+        ranks = "과장";
+    }
+    else if (ranks == "부장")
+    {
+        promoted = false;
+        ranks = "차장";
+    }
+
+    if (collisitionCount == 0)
+    {
+        GameOver();
     }
 
     // '^'에 닿았을 때 게임 오버
@@ -287,6 +395,52 @@ int main()
                     Draw();
                     Input();
                     Logic();
+                    if (score >= 15 && !promoted)
+                    {
+                        gotoxy(width / 2 - 5, height / 2);
+                        ranks = "사원";
+                        promoted = true; // 승진 상태를 true로 변경하여 중복 표시를 방지
+                    }
+                    promoted = false;
+                    if (score >= 25 && !promoted)
+                    {
+                        gotoxy(width / 2 - 5, height / 2);
+                        ranks = "주임";
+                        promoted = true;
+                    }
+                    promoted = false;
+                    if (score >= 40 && !promoted)
+                    {
+                        gotoxy(width / 2 - 5, height / 2);
+                        ranks = "대리";
+                        promoted = true;
+                    }
+                    promoted = false;
+                    if (score >= 55 && !promoted)
+                    {
+                        gotoxy(width / 2 - 5, height / 2);
+                        ranks = "과장";
+                        promoted = true;
+                    }
+                    promoted = false;
+                    if (score >= 70 && !promoted)
+                    {
+                        gotoxy(width / 2 - 5, height / 2);
+                        ranks = "차장";
+                        promoted = true;
+                    }
+                    promoted = false;
+                    if (score >= 85 && !promoted)
+                    {
+                        gotoxy(width / 2 - 5, height / 2);
+                        ranks = "부장";
+                        promoted = true;
+                    }
+                    promoted = false;
+                    if (score >= 105 && !promoted)
+                    {
+                        GameOver1();
+                    }
                     Sleep(50); // 게임 속도 조절을 위한 지연
                 }
                 GameOver();
